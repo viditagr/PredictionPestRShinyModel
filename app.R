@@ -81,11 +81,16 @@ apply_chemical_control <- function(df, control_params) {
         insectPlant == "Japanese Beetle on Apple" ||
         insectPlant == "Spotted Wing Drosophila on Strawberry") {
     if (stage == "Immatures") {
+      if(df[df$Date == date, "Immatures"] == 0) {
+        return(df)
+      }
       if (frequency == "Once") {
         df[df$Date >= date, "Immatures"] <-
           df[df$Date >= date, "Immatures"] * 0.65 * efficacy
         df[df$Date >= date + 10, "Adults"] <-
           df[df$Date >= date + 10, "Adults"] * 0.65 * efficacy
+        df[df$Date >= date + 20, "Eggs"] <-
+          df[df$Date >= date + 20, "Eggs"] * 0.65 * efficacy
       }
       if (frequency == "Weekly") {
         for (i in seq(from = date, to = max(df$Date), by = 7)) {
@@ -93,6 +98,8 @@ apply_chemical_control <- function(df, control_params) {
             df[df$Date >= i, "Immatures"] * 0.65 * efficacy
           df[df$Date >= i + 10, "Adults"] <-
             df[df$Date >= i + 10, "Adults"] * 0.65 * efficacy
+          df[df$Date >= i + 20, "Eggs"] <-
+            df[df$Date >= i + 20, "Eggs"] * 0.65 * efficacy
         }
       } else if (frequency == "Monthly") {
         for (i in seq(from = date, to = max(df$Date), by = 30)) {
@@ -100,33 +107,55 @@ apply_chemical_control <- function(df, control_params) {
             df[df$Date >= i, "Immatures"] * 0.65 * efficacy
           df[df$Date >= i + 10, "Adults"] <-
             df[df$Date >= i + 10, "Adults"] * 0.65 * efficacy
+          df[df$Date >= i + 20, "Eggs"] <-
+            df[df$Date >= i + 20, "Eggs"] * 0.65 * efficacy
         }
       }
     } else if (stage == "Adults") {
+      if(df[df$Date == date, "Adults"] == 0) {
+        return(df)
+      }
       if (frequency == "Once") {
         df[df$Date >= date, "Adults"] <-
           df[df$Date >= date, "Adults"] * 0.6 * efficacy
+        df[df$Date >= date + 10, "Eggs"] <-
+          df[df$Date >= date + 10, "Eggs"] * 0.6 * efficacy
+        df[df$Date >= date + 20, "Immatures"] <-
+          df[df$Date >= date + 20, "Immatures"] * 0.6 * efficacy
       }
       if (frequency == "Weekly") {
         for (i in seq(from = date, to = max(df$Date), by = 7)) {
           df[df$Date >= i, "Adults"] <-
             df[df$Date >= i, "Adults"] * 0.6 * efficacy
+          df[df$Date >= date + 10, "Eggs"] <-
+            df[df$Date >= date + 10, "Eggs"] * 0.6 * efficacy
+          df[df$Date >= date + 20, "Immatures"] <-
+            df[df$Date >= date + 20, "Immatures"] * 0.6 * efficacy
         }
       } else if (frequency == "Monthly") {
         for (i in seq(from = date, to = max(df$Date), by = 30)) {
           df[df$Date >= i, "Adults"] <-
             df[df$Date >= i, "Adults"] * 0.6 * efficacy
+          df[df$Date >= date + 10, "Eggs"] <-
+            df[df$Date >= date + 10, "Eggs"] * 0.6 * efficacy
+          df[df$Date >= date + 20, "Immatures"] <-
+            df[df$Date >= date + 20, "Immatures"] * 0.6 * efficacy
         }
       }
     }
   }
   if (insectPlant == "Aphids on Soybean" ||
         insectPlant == "Hemlock Woolly Adelgid") {
+    if (df[df$Date == date, "Immatures"] == 0) {
+      return(df)
+    }
     if (frequency == "Once") {
       df[df$Date >= date, "Immatures"] <-
         df[df$Date >= date, "Immatures"] * 0.6 * efficacy
       df[df$Date >= date, "Adults"] <-
         df[df$Date >= date, "Adults"] * 0.6 * efficacy
+      df[df$Date >= date, "Eggs"] <-
+        df[df$Date >= date, "Eggs"] * 0.6 * efficacy
     }
     if (frequency == "Weekly") {
       for (i in seq(from = date, to = max(df$Date), by = 7)) {
@@ -134,6 +163,8 @@ apply_chemical_control <- function(df, control_params) {
           df[df$Date >= i, "Immatures"] * 0.6 * efficacy
         df[df$Date >= i, "Adults"] <-
           df[df$Date >= i, "Adults"] * 0.6 * efficacy
+        df[df$Date >= i, "Eggs"] <-
+          df[df$Date >= i, "Eggs"] * 0.6 * efficacy
       }
     } else if (frequency == "Monthly") {
       for (i in seq(from = date, to = max(df$Date), by = 30)) {
@@ -141,16 +172,23 @@ apply_chemical_control <- function(df, control_params) {
           df[df$Date >= i, "Immatures"] * 0.6 * efficacy
         df[df$Date >= i, "Adults"] <-
           df[df$Date >= i, "Adults"] * 0.6 * efficacy
+        df[df$Date >= i, "Eggs"] <-
+          df[df$Date >= i, "Eggs"] * 0.6 * efficacy
       }
     }
   }
   if (insectPlant == "Emerald Ash Borer") {
+    if (df[df$Date == date, "Immatures"] == 0) {
+      return(df)
+    }
     if (stage == "Immatures") {
       if (frequency == "Once") {
         df[df$Date >= date, "Immatures"] <-
           df[df$Date >= date, "Immatures"] * 0.6 * efficacy
         df[df$Date >= date, "Adults"] <-
           df[df$Date >= date, "Adults"] * 0.6 * efficacy
+        df[df$Date >= date, "Eggs"] <-
+          df[df$Date >= date, "Eggs"] * 0.6 * efficacy
       }
     }
     if (frequency == "Weekly") {
@@ -159,6 +197,8 @@ apply_chemical_control <- function(df, control_params) {
           df[df$Date >= i, "Immatures"] * 0.6 * efficacy
         df[df$Date >= i, "Adults"] <-
           df[df$Date >= i, "Adults"] * 0.6 * efficacy
+        df[df$Date >= i, "Eggs"] <-
+          df[df$Date >= i, "Eggs"] * 0.6 * efficacy
       }
     }
     if (frequency == "Monthly") {
@@ -167,6 +207,8 @@ apply_chemical_control <- function(df, control_params) {
           df[df$Date >= i, "Immatures"] * 0.6 * efficacy
         df[df$Date >= i, "Adults"] <-
           df[df$Date >= i, "Adults"] * 0.6 * efficacy
+        df[df$Date >= i, "Eggs"] <-
+          df[df$Date >= i, "Eggs"] * 0.6 * efficacy
       }
     }
   }
@@ -186,7 +228,6 @@ apply_biological_control <- function(df, control_params) {
   print(paste("efficacy", efficacy))
   print(paste("date", date))
   if (efficacy == "0" || efficacy == "") {
-    print("flag")
     return(df)
   }
   if (insectPlant == "Corn Rootworm on Corn") {
@@ -420,7 +461,6 @@ server <- function(input, output, session) {
     updateNumericInput(session, "bioEfficacy", value = "")
     updateDateInput(session, "bioDate", value = Sys.Date())
     output$plot <- renderPlot(NULL)  # Remove the plot
-    # Remove the images
     output$selectedImageUI1 <- renderUI({ NULL })
   })
   data <- eventReactive(input$apply, {
@@ -433,11 +473,11 @@ server <- function(input, output, session) {
     filename <- paste0("data/", filename)
     df <- read.csv(filename, header = TRUE)  # Read the data
     if(input$tempConditions == "Cold") {
-      subset(df, select = c(1, 3, 4, ncol(df)))
+      subset(df, select = c(1, 2, 3, 4, ncol(df)))
     } else if (input$tempConditions == "Average") {
-      subset(df, select = c(5, 7, 8, ncol(df)))
+      subset(df, select = c(5, 6, 7, 8, ncol(df)))
     } else if (input$tempConditions == "Hot") {
-      subset(df, select = c(9, 11, 12, ncol(df)))
+      subset(df, select = c(9, 10, 11, 12, ncol(df)))
     }
   })
   observeEvent(input$apply, {
@@ -447,10 +487,9 @@ server <- function(input, output, session) {
       #Convert date column
       df[, 1] <- as.Date(df[, 1])
       colnames(df)[1] <- "Date"  # Assign the column name 'Date'
-      #print(colnames(df)[3])
-      #colnames(df)[2] <- "Eggs"
-      colnames(df)[2] <- "Immatures"
-      colnames(df)[3] <- "Adults"
+      colnames(df)[2] <- "Eggs"
+      colnames(df)[3] <- "Immatures"
+      colnames(df)[4] <- "Adults"
       #Change the values of some Biocontrol columns to 0
       df[df$Date <= as.Date("1998-03-15") |
            df$Date >= as.Date("1998-10-15"), "Biocontrol"] <- NA
@@ -482,6 +521,7 @@ server <- function(input, output, session) {
       ggplot(df_long, aes(x = Date, y = Value,
                           colour = Population)) +
         geom_line(size = 1.5) +
+        scale_y_continuous(limits = c(0, 125)) +
         scale_x_date(date_labels = "%m-%d") +  # Add this line
         theme_bw() +
         labs(x = "Date", y = "Number of Individuals",
