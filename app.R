@@ -215,11 +215,78 @@ apply_chemical_control <- function(df, control_params) {
   return(df)
 }
 
+egg_cascade <- function(df, date, efficacy) {
+  # Define the number of days over which the effect should be applied
+  num_days <- 15
+  # Apply the effect gradually over the specified number of days
+  for (i in 0:num_days) {
+    # Calculate the current efficacy
+    current_efficacy <- (1 - ((1 - (efficacy * 0.65)) * (i / num_days)))
+    # Apply the effect to the "Eggs", "Immatures", and "Adults" on the current date
+    df[df$Date == date + i, "Eggs"] <- df[df$Date == date + i, "Eggs"] * current_efficacy
+    df[df$Date == date + i, "Immatures"] <- df[df$Date == date + i + num_days, "Immatures"] * current_efficacy
+    df[df$Date == date + i, "Adults"] <- df[df$Date == date + i + 2*num_days, "Adults"] * current_efficacy
+  }
+  df[df$Date >= date + num_days + 1, "Eggs"] <- df[df$Date >= date + num_days + 1, "Eggs"] * 0.65 * efficacy
+  df[df$Date >= date + 2*num_days + 1, "Immatures"] <- df[df$Date >= date + 2*num_days + 1, "Immatures"] * 0.65 * efficacy
+  df[df$Date >= date + 3*num_days + 1, "Adults"] <- df[df$Date >= date + 3*num_days + 1, "Adults"] * 0.65 * efficacy
+  # Return the modified data frame
+  return(df)
+}
+
+immature_cascade <- function(df, date, efficacy) {
+  # Define the number of days over which the effect should be applied
+  num_days <- 15
+  # Apply the effect gradually over the specified number of days
+  for (i in 0:num_days) {
+    # Calculate the current efficacy
+    current_efficacy <- (1 - ((1 - (efficacy * 0.65)) * (i / num_days)))
+    # Apply the effect to the "Immatures", "Adults", and "Eggs" on the current date
+    df[df$Date == date + i, "Immatures"] <- df[df$Date == date + i, "Immatures"] * current_efficacy
+    df[df$Date == date + i + num_days, "Adults"] <- df[df$Date == date + i + num_days, "Adults"] * current_efficacy
+    df[df$Date == date + i + 2*num_days, "Eggs"] <- df[df$Date == date + i + 2*num_days, "Eggs"] * current_efficacy
+  }
+  df[df$Date >= date + num_days + 1, "Immatures"] <- df[df$Date >= date + num_days + 1, "Immatures"] * 0.65 * efficacy
+  df[df$Date >= date + 2*num_days + 1, "Adults"] <- df[df$Date >= date + 2*num_days + 1, "Adults"] * 0.65 * efficacy
+  df[df$Date >= date + 3*num_days + 1, "Eggs"] <- df[df$Date >= date + 3*num_days + 1, "Eggs"] * 0.65 * efficacy
+  # Return the modified data frame
+  return(df)
+}
+
+adult_cascade <- function(df, date, efficacy) {
+  # Define the number of days over which the effect should be applied
+  num_days <- 15
+  
+  # Apply the effect gradually over the specified number of days
+  for (i in 0:num_days) {
+    # Calculate the current efficacy
+    current_efficacy <- (1 - ((1 - (efficacy * 0.65)) * (i / num_days)))
+    
+    # Apply the effect to the "Adults", "Eggs", and "Immatures" on the current date
+    df[df$Date == date + i, "Adults"] <- df[df$Date == date + i, "Adults"] * current_efficacy
+    df[df$Date == date + i + num_days, "Eggs"] <- df[df$Date == date + i + num_days, "Eggs"] * current_efficacy
+    df[df$Date == date + i + 2*num_days, "Immatures"] <- df[df$Date == date + i + 2*num_days, "Immatures"] * current_efficacy
+  }
+  
+  df[df$Date >= date + num_days + 1, "Adults"] <- df[df$Date >= date + num_days + 1, "Adults"] * 0.65 * efficacy
+  df[df$Date >= date + 2*num_days + 1, "Eggs"] <- df[df$Date >= date + 2*num_days + 1, "Eggs"] * 0.65 * efficacy
+  df[df$Date >= date + 3*num_days + 1, "Immatures"] <- df[df$Date >= date + 3*num_days + 1, "Immatures"] * 0.65 * efficacy
+  
+  # Return the modified data frame
+  return(df)
+}
+
+
+
+
 apply_biological_control <- function(df, control_params) {
   #Extract the parameters
   insectPlant <- control_params$interactionType
   target <- control_params$bioTarget
   efficacy <- control_params$bioEfficacy
+  if (efficacy == "" || efficacy == "0" || target == "\a") {
+    return(df)
+  }
   date <- as.Date(control_params$bioDate)
   # Change the year to 1998 no matter what
   date <- as.Date(paste0("1998-", format(date, "%m-%d")))
@@ -227,68 +294,42 @@ apply_biological_control <- function(df, control_params) {
   print(paste("stage", target))
   print(paste("efficacy", efficacy))
   print(paste("date", date))
-  if (efficacy == "0" || efficacy == "") {
-    return(df)
-  }
+
   if (insectPlant == "Corn Rootworm on Corn") {
     if (target == "Generalist") {
-      df[df$Date >= date, "Immatures"] <-
-        df[df$Date >= date, "Immatures"] * 0.65 * efficacy
-      df[df$Date >= date + 10, "Adults"] <-
-        df[df$Date >= date + 10, "Adults"] * 0.65 * efficacy
+      df <- immature_cascade(df, date, efficacy)
     } else if (target == "Specialist") {
-      df[df$Date >= date, "Eggs"] <-
-        df[df$Date >= date, "Eggs"] * 0.65 * efficacy
-      df[df$Date >= date + 10, "Immatures"] <-
-        df[df$Date >= date + 10, "Immatures"] * 0.65 * efficacy
-      df[df$Date >= date + 20, "Adults"] <-
-        df[df$Date >= date + 20, "Adults"] * 0.65 * efficacy
+      df <- egg_cascade(df, date, efficacy)
     }
   }
   if (insectPlant == "Aphids on Soybean" ||
       insectPlant == "Hemlock Woolly Adelgid") {
     if (target == "Generalist") {
-      df[df$Date >= date, "Immatures"] <-
-        df[df$Date >= date, "Immatures"] * 0.65 * efficacy
-      df[df$Date >= date, "Adults"] <-
-        df[df$Date >= date, "Adults"] * 0.65 * efficacy
+      df <- immature_cascade(df, date, efficacy)
+      df <- adult_cascade(df, date, efficacy)
     } else if (target == "Specialist") {
-      df[df$Date >= date, "Immatures"] <-
-        df[df$Date >= date, "Immatures"] * 0.65 * efficacy
-      df[df$Date >= date + 10, "Adults"] <-
-        df[df$Date >= date + 10, "Adults"] * 0.65 * efficacy
+      df <- immature_cascade(df, date, efficacy)
+      df <- adult_cascade(df, date, efficacy)
     }
   }
   if (insectPlant == "Japanese Beetle on Apple") {
     if (target == "Generalist") {
-      df[df$Date >= date, "Immatures"] <-
-        df[df$Date >= date, "Immatures"] * 0.6 * efficacy
-      df[df$Date >= date + 10, "Adults"] <-
-        df[df$Date >= date + 10, "Adults"] * 0.6 * efficacy
+      df <- immature_cascade(df, date, efficacy)
     } else if (target == "Specialist") {
-      df[df$Date >= date, "Immatures"] <-
-        df[df$Date >= date, "Immatures"] * 0.65 * efficacy
-      df[df$Date >= date + 10, "Adults"] <-
-        df[df$Date >= date + 10, "Adults"] * 0.65 * efficacy
+      df <- immature_cascade(df, date, efficacy)
     }
   }
   if (insectPlant == "Spotted Wing Drosophila on Strawberry") {
     if (target == "Generalist") {
-      df[df$Date >= date, "Adults"] <-
-        df[df$Date >= date, "Adults"] * 0.6 * efficacy
+      df <- adult_cascade(df, date, efficacy)
     } else if (target == "Specialist") {
-      df[df$Date >= date, "Adults"] <-
-        df[df$Date >= date, "Adults"] * 0.6 * efficacy
-      df[df$Date >= date + 10, "Immatures"] <-
-        df[df$Date >= date + 10, "Immatures"] * 0.6 * efficacy
+      df <- adult_cascade(df, date, efficacy)
     }
   }
   if(insectPlant == "Emerald Ash Borer") {
     if (target == "Specialist") {
-      df[df$Date >= date, "Immatures"] <-
-        df[df$Date >= date, "Immatures"] * 0.6 * efficacy
-      df[df$Date >= date, "Adults"] <-
-        df[df$Date >= date, "Adults"] * 0.6 * efficacy
+      df <- immature_cascade(df, date, efficacy)
+      df <- adult_cascade(df, date, efficacy)
     }
   }
   return(df)
@@ -509,7 +550,7 @@ server <- function(input, output, session) {
                                  bioTarget = input$bioTarget,
                                  bioEfficacy = input$bioEfficacy,
                                  bioDate = input$bioDate)
-      if (input$bioTarget != "\a") {
+      if (input$bioTarget != "\a" && input$bioEfficacy != "") {
         df <- apply_biological_control(df, bio_control_params)
       }
 
