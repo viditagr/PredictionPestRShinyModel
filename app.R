@@ -52,9 +52,10 @@ ui <- fluidPage(
 
     # Show a plot of the generated distribution
     mainPanel(
+      uiOutput("selectedImageUI1"),
       plotOutput("plot", height = "700px")
     )
-)
+  )
 )
 
 
@@ -254,6 +255,7 @@ apply_biological_control <- function(df, control_params) {
 
 # Define server logic
 server <- function(input, output, session) {
+
   observeEvent(input$pestType, {
     if (input$pestType == "Agronomic") {
       updateSelectInput(session, "interactionType",
@@ -270,6 +272,141 @@ server <- function(input, output, session) {
     }
   })
 
+  observeEvent(input$interactionType, {
+    pest_type <- input$interactionType
+    print("FLAG")
+    if(pest_type == "Corn Rootworm on Corn"){
+      output$selectedImageUI1 <- renderUI({
+        tagList(
+          div(style = "display: inline-block; width: 300px; 
+              height: 320px; margin-right: 10px;",
+            img(src = "images/rootworm_immature.png",
+                width = "100%", height = "100%",
+                alt = "Corn Rootworm Immature", contentType = "image/png"),
+            p("Corn Rootworm Immature")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px;",
+            img(src = "images/rootworm_adult.png",
+                width = "100%", height = "100%",
+                alt = "Corn Rootworm Adult", contentType = "image/png"),
+            p("Corn Rootworm Adult")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px;",
+            img(src = "images/rootworm_crop_corn.png",
+                width = "100%", height = "100%",
+                alt = "Corn Plant", contentType = "image/png"),
+            p("Corn Plant")
+          )
+        )
+      })
+    }
+    if(pest_type == "Japanese Beetle on Apple"){
+      output$selectedImageUI1 <- renderUI({
+        tagList(
+          div(style = "display: inline-block; width: 300px;
+              height: 320px; margin-right: 10px;",
+            img(src = "images/beetle_immature.png",
+                width = "100%", height = "100%", alt = "Beetle Immature",
+                contentType = "image/png"),
+            p("Beetle Immature")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px;",
+            img(src = "images/beetle_adult.png", width = "100%",
+                height = "100%", alt = "Beetle Adult",
+                contentType = "image/png"),
+            p("Beetle Adult")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px;",
+            img(src = "images/beetle_crop_apple.png", width = "100%",
+                height = "100%", alt = "Apple Plant",
+                contentType = "image/png"),
+            p("Apple Plant")
+          )
+        )
+      })
+    }
+    if(pest_type == "Emerald Ash Borer"){
+      output$selectedImageUI1 <- renderUI({
+        tagList(
+          div(style = "display: inline-block; width: 300px;
+              height: 320px; margin-right: 10px;",
+            img(src = "images/borer_immature.png", width = "100%",
+                height = "100%", alt = "Borer Immature",
+                contentType = "image/png"),
+            p("Borer Immature")
+          ),
+          div(style = "display: inline-block; width: 300px;
+              height: 320px; margin-right: 10px;",
+            img(src = "images/borer_adult.png", width = "100%",
+                height = "100%", alt = "Borer Adult",
+                contentType = "image/png"),
+            p("Borer Adult")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px;",
+            img(src = "images/borer_crop_ash.png", width = "100%",
+                height = "100%", alt = "Ash Plant",
+                contentType = "image/png"),
+            p("Ash Plant")
+          )
+        )
+      })
+    }
+    if(pest_type == "Hemlock Woolly Adelgid"){
+      output$selectedImageUI1 <- renderUI({
+        tagList(
+          div(style = "display: inline-block; width: 300px; height: 320px; margin-right: 10px;",
+            img(src = "images/hwa_immature.png", width = "100%", height = "100%", alt = "HWA Immature", contentType = "image/png"),
+            p("Hemlock Woolly Adelgid Immature")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px; margin-right: 10px;",
+            img(src = "images/hwa_adult.png", width = "100%", height = "100%", alt = "HWA Adult", contentType = "image/png"),
+            p("Hemlock Woolly Adelgid Adult")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px;",
+            img(src = "images/hwa_crop_hemlock.png", width = "100%", height = "100%", alt = "Hemlock Plant", contentType = "image/png"),
+            p("Hemlock Tree")
+          )
+        )
+      })
+    }
+    if(pest_type == "Aphids on Soybean"){
+      output$selectedImageUI1 <- renderUI({
+        tagList(
+          div(style = "display: inline-block; width: 300px; height: 320px; margin-right: 10px;",
+            img(src = "images/soybean_immature.png", width = "100%", height = "100%", alt = "Soybean Aphid Immature", contentType = "image/png"),
+            p("Aphid Immature")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px; margin-right: 10px;",
+            img(src = "images/soybean_adult.png", width = "100%", height = "100%", alt = "Soybean Aphid Adult", contentType = "image/png"),
+            p("Aphid Adult")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px;",
+            img(src = "images/soybean_crop_soybean.png", width = "100%", height = "100%", alt = "Soybean Plant", contentType = "image/png"),
+            p("Soybean Plant")
+          )
+        )
+      })
+    }
+    if(pest_type == "Spotted Wing Drosophila on Strawberry"){
+      output$selectedImageUI1 <- renderUI({
+        tagList(
+          div(style = "display: inline-block; width: 300px; height: 320px; margin-right: 10px;",
+            img(src = "images/swd_immature.png", width = "100%", height = "100%", alt = "Spotted Wing Drosophila Immature", contentType = "image/png"),
+            p("Spotted Wing Drosophila Immature")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px; margin-right: 10px;",
+            img(src = "images/swd_adult.png", width = "100%", height = "100%", alt = "Spotted Wing Drosophila Adult", contentType = "image/png"),
+            p("Spotted Wing Drosophila Adult")
+          ),
+          div(style = "display: inline-block; width: 300px; height: 320px;",
+            img(src = "images/swd_crop_strawberry.png", width = "100%", height = "100%", alt = "Strawberry Plant", contentType = "image/png"),
+            p("Strawberry Plant")
+          )
+        )
+      })
+    }
+  })
+
 
   observeEvent(input$clear, {
     updateSelectInput(session, "pestType", selected = "\a")
@@ -283,6 +420,8 @@ server <- function(input, output, session) {
     updateNumericInput(session, "bioEfficacy", value = "")
     updateDateInput(session, "bioDate", value = Sys.Date())
     output$plot <- renderPlot(NULL)  # Remove the plot
+    # Remove the images
+    output$selectedImageUI1 <- renderUI({ NULL })
   })
   data <- eventReactive(input$apply, {
     # Add some railings here to protect the fill in the blanks,
